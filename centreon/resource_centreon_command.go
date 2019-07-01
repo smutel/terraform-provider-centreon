@@ -34,7 +34,7 @@ func resourceCentreonCommandCreate(d *schema.ResourceData, m interface{}) error 
 	cmdName := d.Get("name").(string)
 	cmdType := d.Get("type").(string)
 	cmdLine := d.Get("line").(string)
-	client := m.(*centreonweb.CentreonwebClient)
+	client := m.(*centreonweb.ClientCentreonWeb)
 
 	cmd := centreonweb.Command{
 		Name: cmdName,
@@ -52,7 +52,7 @@ func resourceCentreonCommandCreate(d *schema.ResourceData, m interface{}) error 
 }
 
 func resourceCentreonCommandRead(d *schema.ResourceData, m interface{}) error {
-	client := m.(*centreonweb.CentreonwebClient)
+	client := m.(*centreonweb.ClientCentreonWeb)
 
 	cmd, err := client.Commands().Get(d.Id())
 	if err != nil {
@@ -71,7 +71,7 @@ func resourceCentreonCommandRead(d *schema.ResourceData, m interface{}) error {
 }
 
 func resourceCentreonCommandUpdate(d *schema.ResourceData, m interface{}) error {
-	client := m.(*centreonweb.CentreonwebClient)
+	client := m.(*centreonweb.ClientCentreonWeb)
 	d.Partial(true)
 
 	if d.HasChange("name") {
@@ -105,7 +105,7 @@ func resourceCentreonCommandUpdate(d *schema.ResourceData, m interface{}) error 
 }
 
 func resourceCentreonCommandDelete(d *schema.ResourceData, m interface{}) error {
-	client := m.(*centreonweb.CentreonwebClient)
+	client := m.(*centreonweb.ClientCentreonWeb)
 	resourceExists, err := resourceCentreonCommandExists(d, m)
 	if err != nil {
 		return err
@@ -123,6 +123,6 @@ func resourceCentreonCommandDelete(d *schema.ResourceData, m interface{}) error 
 }
 
 func resourceCentreonCommandExists(d *schema.ResourceData, m interface{}) (b bool, e error) {
-	client := m.(*centreonweb.CentreonwebClient)
+	client := m.(*centreonweb.ClientCentreonWeb)
 	return client.Commands().Exists(d.Id())
 }

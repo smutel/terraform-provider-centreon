@@ -11,10 +11,10 @@ type login struct {
 	AuthToken string `json:"authToken"`
 }
 
-func (cli *CentreonwebClient) login() error {
+func (cli *ClientCentreonWeb) login() error {
 	reqInputs := client.RequestInput{
 		Method: http.MethodPost,
-		Path:   centreon_api_path,
+		Path:   centreonAPIPath,
 		Query:  cli.AuthQuery,
 		Header: cli.AuthHeader,
 		Body:   cli.AuthInput,

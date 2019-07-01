@@ -6,16 +6,19 @@ import (
 	pkgerrors "github.com/pkg/errors"
 )
 
-const command_object string = "CMD"
+const commandObject string = "CMD"
 
-type commandsClient struct {
-	CentClient *CentreonwebClient
+// ClientCommands is used to store the client to interact with the Centreon API
+type ClientCommands struct {
+	CentClient *ClientCentreonWeb
 }
 
+// Commands is an array of Command to store the answer from Centreon API
 type Commands struct {
 	Cmd []Command `json:"result"`
 }
 
+// Command struct is used to store parameters of a command
 type Command struct {
 	ID   string `json:"id"`
 	Name string `json:"name"`
@@ -23,8 +26,9 @@ type Command struct {
 	Line string `json:"line"`
 }
 
-func (c *commandsClient) Show(name string) ([]Command, error) {
-	respReader, err := c.CentClient.centreonApiRequest("show", command_object, name)
+// Show lists available commands
+func (c *ClientCommands) Show(name string) ([]Command, error) {
+	respReader, err := c.CentClient.centreonAPIRequest("show", commandObject, name)
 	if err != nil {
 		return nil, err
 	}
@@ -40,7 +44,8 @@ func (c *commandsClient) Show(name string) ([]Command, error) {
 	return cmds.Cmd, nil
 }
 
-func (c *commandsClient) Get(name string) (Command, error) {
+// Get returns a specific command
+func (c *ClientCommands) Get(name string) (Command, error) {
 	var cmdFound Command
 	cmds, err := c.Show(name)
 	if err != nil {
@@ -60,7 +65,8 @@ func (c *commandsClient) Get(name string) (Command, error) {
 	return cmdFound, nil
 }
 
-func (c *commandsClient) Exists(name string) (bool, error) {
+// Exists returns true if the command exists, false otherwise
+func (c *ClientCommands) Exists(name string) (bool, error) {
 	cmdExists := false
 
 	cmds, err := c.Show(name)
@@ -77,10 +83,11 @@ func (c *commandsClient) Exists(name string) (bool, error) {
 	return cmdExists, nil
 }
 
-func (c *commandsClient) Add(cmd Command) error {
+// Add adds a new command
+func (c *ClientCommands) Add(cmd Command) error {
 	values := cmd.Name + ";" + cmd.Type + ";" + cmd.Line
 
-	respReader, err := c.CentClient.centreonApiRequest("add", command_object, values)
+	respReader, err := c.CentClient.centreonAPIRequest("add", commandObject, values)
 	if err != nil {
 		return err
 	}
@@ -92,8 +99,9 @@ func (c *commandsClient) Add(cmd Command) error {
 	return nil
 }
 
-func (c *commandsClient) Del(name string) error {
-	respReader, err := c.CentClient.centreonApiRequest("del", command_object, name)
+// Del removes the specified command
+func (c *ClientCommands) Del(name string) error {
+	respReader, err := c.CentClient.centreonAPIRequest("del", commandObject, name)
 	if err != nil {
 		return err
 	}
@@ -105,10 +113,11 @@ func (c *commandsClient) Del(name string) error {
 	return nil
 }
 
-func (c *commandsClient) Setparam(name string, param string, value string) error {
+// Setparam is used to change a specific parameters for a command
+func (c *ClientCommands) Setparam(name string, param string, value string) error {
 	values := name + ";" + param + ";" + value
 
-	respReader, err := c.CentClient.centreonApiRequest("setparam", command_object, values)
+	respReader, err := c.CentClient.centreonAPIRequest("setparam", commandObject, values)
 	if err != nil {
 		return err
 	}

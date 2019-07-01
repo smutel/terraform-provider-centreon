@@ -9,9 +9,11 @@ import (
 	"github.com/smutel/go-centreon/client"
 )
 
-const centreon_api_path string = "/centreon/api/index.php"
+const centreonAPIPath string = "/centreon/api/index.php"
 
-type CentreonwebClient struct {
+// ClientCentreonWeb struct is used to store everything needed to communicate
+// with the Centreon API.
+type ClientCentreonWeb struct {
 	MainClient *client.Client
 
 	ConfigQuery  *url.Values
@@ -29,7 +31,8 @@ type centreonwebConfigInput struct {
 	Values string
 }
 
-func New(centreonURL string, insecure bool, username string, password string) (*CentreonwebClient, error) {
+// New returns a ClientCentreonWeb object created with the specified parameters
+func New(centreonURL string, insecure bool, username string, password string) (*ClientCentreonWeb, error) {
 	client, err := client.New(centreonURL, insecure)
 
 	if err != nil {
@@ -53,7 +56,7 @@ func New(centreonURL string, insecure bool, username string, password string) (*
 	authHeader := &http.Header{}
 	authHeader.Set("Content-Type", "application/x-www-form-urlencoded; param=value")
 
-	return &CentreonwebClient{
+	return &ClientCentreonWeb{
 		MainClient:   client,
 		ConfigQuery:  configQuery,
 		ConfigHeader: configHeader,
@@ -63,11 +66,13 @@ func New(centreonURL string, insecure bool, username string, password string) (*
 	}, nil
 }
 
-func (c *CentreonwebClient) Commands() *commandsClient {
-	return &commandsClient{c}
+// Commands returns a Commands client used for accessing functions pertaining
+// to Commands functionality in the Centreon API.
+func (c *ClientCentreonWeb) Commands() *ClientCommands {
+	return &ClientCommands{c}
 }
 
-func (c *CentreonwebClient) centreonApiRequest(action string, object string, values string) (io.ReadCloser, error) {
+func (c *ClientCentreonWeb) centreonAPIRequest(action string, object string, values string) (io.ReadCloser, error) {
 	err := c.login()
 	if err != nil {
 		return nil, err
@@ -85,7 +90,7 @@ func (c *CentreonwebClient) centreonApiRequest(action string, object string, val
 
 	reqInputs := client.RequestInput{
 		Method: http.MethodPost,
-		Path:   centreon_api_path,
+		Path:   centreonAPIPath,
 		Query:  c.ConfigQuery,
 		Header: c.ConfigHeader,
 		Body:   body,
@@ -94,15 +99,15 @@ func (c *CentreonwebClient) centreonApiRequest(action string, object string, val
 	respReader, err := c.MainClient.ExecuteRequest(reqInputs)
 	if err != nil {
 		return nil, err
-	} else {
-		return respReader, nil
 	}
+
+	return respReader, nil
 }
 
 func (input *centreonwebConfigInput) toAPI() (map[string]interface{}, error) {
 	params := 2
 	if input.Values != "" {
-		params += 1
+		params++
 	}
 	result := make(map[string]interface{}, params)
 
