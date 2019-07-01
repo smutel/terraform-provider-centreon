@@ -31,22 +31,22 @@ func resourceCentreonCommand() *schema.Resource {
 }
 
 func resourceCentreonCommandCreate(d *schema.ResourceData, m interface{}) error {
-	cmd_name := d.Get("name").(string)
-	cmd_type := d.Get("type").(string)
-	cmd_line := d.Get("line").(string)
+	cmdName := d.Get("name").(string)
+	cmdType := d.Get("type").(string)
+	cmdLine := d.Get("line").(string)
 	client := m.(*centreonweb.CentreonwebClient)
 
 	cmd := centreonweb.Command{
-		Name: cmd_name,
-		Type: cmd_type,
-		Line: cmd_line,
+		Name: cmdName,
+		Type: cmdType,
+		Line: cmdLine,
 	}
 
 	if err := client.Commands().Add(cmd); err != nil {
 		return err
 	}
 
-	d.SetId(cmd_name)
+	d.SetId(cmdName)
 
 	return resourceCentreonCommandRead(d, m)
 }
