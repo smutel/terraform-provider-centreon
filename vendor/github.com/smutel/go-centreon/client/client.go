@@ -13,13 +13,15 @@ import (
 	pkgerrors "github.com/pkg/errors"
 )
 
+// Client struct is used as generic client
 type Client struct {
-	HttpClient *http.Client
-	RequestUrl *url.URL
+	HTTPClient *http.Client
+	RequestURL *url.URL
 }
 
-func New(requestUrl string, insecure bool) (*Client, error) {
-	u, err := url.Parse(requestUrl)
+// New returns a new generic client created with specified parameters
+func New(requestURL string, insecure bool) (*Client, error) {
+	u, err := url.Parse(requestURL)
 	if err != nil {
 		return nil, pkgerrors.Wrap(err, "URL not correctly formatted")
 	}
@@ -30,19 +32,20 @@ func New(requestUrl string, insecure bool) (*Client, error) {
 	}
 
 	c := &Client{
-		HttpClient: http,
-		RequestUrl: u,
+		HTTPClient: http,
+		RequestURL: u,
 	}
 
 	return c, nil
 }
 
+// InsecureSkipTLSVerify turns off TLS verification for the client connection
 func (c *Client) InsecureSkipTLSVerify() {
-	if c.HttpClient == nil {
+	if c.HTTPClient == nil {
 		return
 	}
 
-	c.HttpClient.Transport = httpTransport(true)
+	c.HTTPClient.Transport = httpTransport(true)
 }
 
 func httpTransport(insecureSkipTLSVerify bool) *http.Transport {
@@ -65,6 +68,7 @@ func doNotFollowRedirects(*http.Request, []*http.Request) error {
 	return http.ErrUseLastResponse
 }
 
+// ClearBody removes double quotes from the body
 func ClearBody(body []byte) []byte {
 	if len(body) > 0 && body[0] == '"' {
 		body = body[1:]
@@ -79,6 +83,7 @@ func ClearBody(body []byte) []byte {
 
 // ----------------------------------------------------------------------------
 
+// RequestInput stores the parameters of the centreon API call
 type RequestInput struct {
 	Method string
 	Path   string
@@ -87,6 +92,7 @@ type RequestInput struct {
 	Body   interface{}
 }
 
+// ExecuteRequest will execute the request sent in parameter
 func (c *Client) ExecuteRequest(inputs RequestInput) (io.ReadCloser, error) {
 	method := inputs.Method
 	path := inputs.Path
@@ -108,7 +114,7 @@ func (c *Client) ExecuteRequest(inputs RequestInput) (io.ReadCloser, error) {
 		}
 	}
 
-	endpoint := c.RequestUrl
+	endpoint := c.RequestURL
 	endpoint.Path = path
 	if query != nil {
 		endpoint.RawQuery = query.Encode()
@@ -125,7 +131,7 @@ func (c *Client) ExecuteRequest(inputs RequestInput) (io.ReadCloser, error) {
 		}
 	}
 
-	resp, err := c.HttpClient.Do(req)
+	resp, err := c.HTTPClient.Do(req)
 	if err != nil {
 		return nil, pkgerrors.Wrap(err, "Unable to execute http request")
 	}
@@ -133,7 +139,7 @@ func (c *Client) ExecuteRequest(inputs RequestInput) (io.ReadCloser, error) {
 	if resp.StatusCode >= http.StatusOK &&
 		resp.StatusCode < http.StatusMultipleChoices {
 		return resp.Body, nil
-	} else {
-		return nil, pkgerrors.New("API error: " + resp.Status)
 	}
+
+	return nil, pkgerrors.New("API error: " + resp.Status)
 }

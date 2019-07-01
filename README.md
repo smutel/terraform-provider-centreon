@@ -1,8 +1,10 @@
 # terraform-provider-centreon
 
-Terraform provider to setup [Centreon Web](https://www.centreon.com/en/solutions/centreon/) application.
-
 [![Build Status](https://travis-ci.org/smutel/terraform-provider-centreon.svg?branch=master)](https://travis-ci.org/smutel/terraform-provider-centreon)
+[![Go Report Card](https://goreportcard.com/badge/github.com/smutel/terraform-provider-centreon)](https://goreportcard.com/report/github.com/smutel/terraform-provider-centreon)
+[![Conventional Commits](https://img.shields.io/badge/Conventional%20Commits-1.0.0-yellow.svg)](https://conventionalcommits.org)
+
+Terraform provider to setup [Centreon Web](https://www.centreon.com/en/solutions/centreon/) application.
 
 ## Requirements
 

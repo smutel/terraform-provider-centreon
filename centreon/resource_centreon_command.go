@@ -31,28 +31,28 @@ func resourceCentreonCommand() *schema.Resource {
 }
 
 func resourceCentreonCommandCreate(d *schema.ResourceData, m interface{}) error {
-	cmd_name := d.Get("name").(string)
-	cmd_type := d.Get("type").(string)
-	cmd_line := d.Get("line").(string)
-	client := m.(*centreonweb.CentreonwebClient)
+	cmdName := d.Get("name").(string)
+	cmdType := d.Get("type").(string)
+	cmdLine := d.Get("line").(string)
+	client := m.(*centreonweb.ClientCentreonWeb)
 
 	cmd := centreonweb.Command{
-		Name: cmd_name,
-		Type: cmd_type,
-		Line: cmd_line,
+		Name: cmdName,
+		Type: cmdType,
+		Line: cmdLine,
 	}
 
 	if err := client.Commands().Add(cmd); err != nil {
 		return err
 	}
 
-	d.SetId(cmd_name)
+	d.SetId(cmdName)
 
 	return resourceCentreonCommandRead(d, m)
 }
 
 func resourceCentreonCommandRead(d *schema.ResourceData, m interface{}) error {
-	client := m.(*centreonweb.CentreonwebClient)
+	client := m.(*centreonweb.ClientCentreonWeb)
 
 	cmd, err := client.Commands().Get(d.Id())
 	if err != nil {
@@ -71,7 +71,7 @@ func resourceCentreonCommandRead(d *schema.ResourceData, m interface{}) error {
 }
 
 func resourceCentreonCommandUpdate(d *schema.ResourceData, m interface{}) error {
-	client := m.(*centreonweb.CentreonwebClient)
+	client := m.(*centreonweb.ClientCentreonWeb)
 	d.Partial(true)
 
 	if d.HasChange("name") {
@@ -105,7 +105,7 @@ func resourceCentreonCommandUpdate(d *schema.ResourceData, m interface{}) error 
 }
 
 func resourceCentreonCommandDelete(d *schema.ResourceData, m interface{}) error {
-	client := m.(*centreonweb.CentreonwebClient)
+	client := m.(*centreonweb.ClientCentreonWeb)
 	resourceExists, err := resourceCentreonCommandExists(d, m)
 	if err != nil {
 		return err
@@ -123,6 +123,6 @@ func resourceCentreonCommandDelete(d *schema.ResourceData, m interface{}) error 
 }
 
 func resourceCentreonCommandExists(d *schema.ResourceData, m interface{}) (b bool, e error) {
-	client := m.(*centreonweb.CentreonwebClient)
+	client := m.(*centreonweb.ClientCentreonWeb)
 	return client.Commands().Exists(d.Id())
 }
