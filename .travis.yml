@@ -1,10 +1,7 @@
 dist: xenial
 language: go
 go:
-  - "1.11"
-
-before_script:
-- ln -s $(pwd) /home/travis/gopath/src/go-centreon
+  - "1.12"
 
 script:
 - make tools check

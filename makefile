@@ -22,20 +22,21 @@ localinstall:
 check:
 	@echo "==> Checking terraform-provider-centreon"
 	gometalinter \
-    		--deadline 10m \
-    		--vendor \
-    		--sort="path" \
-    		--aggregate \
-    		--enable-gc \
-    		--disable-all \
-    		--enable goimports \
-    		--enable misspell \
-    		--enable vet \
-    		--enable deadcode \
-    		--enable varcheck \
-    		--enable ineffassign \
-    		--enable gofmt \
-				./...
+		--deadline 10m \
+		--vendor \
+		--sort="path" \
+		--aggregate \
+		--enable-gc \
+		--disable-all \
+		--enable goimports \
+		--enable misspell \
+		--enable vet \
+		--enable deadcode \
+		--enable varcheck \
+		--enable ineffassign \
+		--enable gofmt \
+		--enable golint \
+		./...
 
 clean:
 	@echo "==> Cleaning terraform-provider-centreon"
