@@ -1,0 +1,5 @@
+{
+  "name": "terraform-provider-centreon",
+  "version": "0.0.1",
+  "description": "Terraform provider to setup centreon application"
+}
