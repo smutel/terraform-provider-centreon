@@ -80,7 +80,7 @@ func resourceCentreonCommandUpdate(d *schema.ResourceData, m interface{}) error 
 		}
 
 		d.SetId(d.Get("name").(string))
-		d.SetPartial("type")
+		d.SetPartial("name")
 	}
 
 	if d.HasChange("type") {

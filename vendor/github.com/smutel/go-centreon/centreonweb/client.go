@@ -72,6 +72,12 @@ func (c *ClientCentreonWeb) Commands() *ClientCommands {
 	return &ClientCommands{c}
 }
 
+// Timeperiods returns a Timeperiods client used for accessing functions pertaining
+// to Timeperiods functionality in the Centreon API.
+func (c *ClientCentreonWeb) Timeperiods() *ClientTimeperiods {
+	return &ClientTimeperiods{c}
+}
+
 func (c *ClientCentreonWeb) centreonAPIRequest(action string, object string, values string) (io.ReadCloser, error) {
 	err := c.login()
 	if err != nil {
