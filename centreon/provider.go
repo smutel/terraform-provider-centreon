@@ -38,6 +38,7 @@ func Provider() *schema.Provider {
 			"centreon_command":              resourceCentreonCommand(),
 			"centreon_timeperiod":           resourceCentreonTimeperiod(),
 			"centreon_timeperiod_exception": resourceCentreonTimeperiodException(),
+			"centreon_host":                 resourceCentreonHost(),
 		},
 		ConfigureFunc: configureProvider,
 	}
