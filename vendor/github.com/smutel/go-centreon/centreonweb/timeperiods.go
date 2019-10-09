@@ -61,6 +61,7 @@ type TimeperiodException struct {
 func (c *ClientTimeperiods) Show(name string) ([]Timeperiod, error) {
 	respReader, err := c.CentClient.centreonAPIRequest("show", timeperiodObject,
 		name)
+
 	if err != nil {
 		return nil, err
 	}
@@ -172,9 +173,9 @@ func (c *ClientTimeperiods) Del(name string) error {
 func (c *ClientTimeperiods) Setparam(name string, param string,
 	value string) error {
 
-	if name == "" || param == "" || value == "" {
-		return pkgerrors.New("name, param or value parameters cannot be empty " +
-			"when calling Setparam function")
+	if name == "" || param == "" {
+		return pkgerrors.New("name or param parameters cannot be empty when " +
+			"calling Setparam function")
 	}
 
 	values := name + ";" + param + ";" + value
@@ -195,9 +196,9 @@ func (c *ClientTimeperiods) Setparam(name string, param string,
 func (c *ClientTimeperiods) Setexception(name string, param string,
 	value string) error {
 
-	if name == "" || param == "" || value == "" {
-		return pkgerrors.New("name, param or value parameters cannot be empty " +
-			"when calling Setexception function")
+	if name == "" || param == "" {
+		return pkgerrors.New("name or param parameters cannot be empty when " +
+			"calling Setexception function")
 	}
 
 	values := name + ";" + param + ";" + value
@@ -245,7 +246,7 @@ func (c *ClientTimeperiods) Getexception(name string) ([]TimeperiodException,
 func (c *ClientTimeperiods) Delexception(name string, param string) error {
 	if name == "" || param == "" {
 		return pkgerrors.New("name or param parameters cannot be empty " +
-			"when calling Setexception function")
+			"when calling Delexception function")
 	}
 
 	values := name + ";" + param

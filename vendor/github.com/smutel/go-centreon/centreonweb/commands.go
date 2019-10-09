@@ -28,7 +28,9 @@ type Command struct {
 
 // Show lists available commands
 func (c *ClientCommands) Show(name string) ([]Command, error) {
-	respReader, err := c.CentClient.centreonAPIRequest("show", commandObject, name)
+	respReader, err := c.CentClient.centreonAPIRequest("show", commandObject,
+		name)
+
 	if err != nil {
 		return nil, err
 	}
@@ -46,48 +48,66 @@ func (c *ClientCommands) Show(name string) ([]Command, error) {
 
 // Get returns a specific command
 func (c *ClientCommands) Get(name string) (Command, error) {
-	var cmdFound Command
+	var objFound Command
+
+	if name == "" {
+		return objFound, pkgerrors.New("name parameter cannot be empty when " +
+			"calling Get function")
+	}
+
 	cmds, err := c.Show(name)
 	if err != nil {
-		return cmdFound, err
+		return objFound, err
 	}
 
 	for _, c := range cmds {
 		if c.Name == name {
-			cmdFound = c
+			objFound = c
 		}
 	}
 
-	if cmdFound.ID == "" {
-		return cmdFound, pkgerrors.New("command " + name + " not found")
+	if objFound.ID == "" {
+		return objFound, pkgerrors.New("command " + name + " not found")
 	}
 
-	return cmdFound, nil
+	return objFound, nil
 }
 
 // Exists returns true if the command exists, false otherwise
 func (c *ClientCommands) Exists(name string) (bool, error) {
-	cmdExists := false
+	objExists := false
+
+	if name == "" {
+		return objExists, pkgerrors.New("name parameter cannot be empty when " +
+			"calling Exists function")
+	}
 
 	cmds, err := c.Show(name)
 	if err != nil {
-		return cmdExists, err
+		return objExists, err
 	}
 
 	for _, c := range cmds {
 		if c.Name == name {
-			cmdExists = true
+			objExists = true
 		}
 	}
 
-	return cmdExists, nil
+	return objExists, nil
 }
 
 // Add adds a new command
 func (c *ClientCommands) Add(cmd Command) error {
+	if cmd.Name == "" || cmd.Type == "" || cmd.Line == "" {
+		return pkgerrors.New("cmd.Name or cmd.Type or cmd.Line parameter cannot" +
+			" be empty when calling Add function")
+	}
+
 	values := cmd.Name + ";" + cmd.Type + ";" + cmd.Line
 
-	respReader, err := c.CentClient.centreonAPIRequest("add", commandObject, values)
+	respReader, err := c.CentClient.centreonAPIRequest("add", commandObject,
+		values)
+
 	if err != nil {
 		return err
 	}
@@ -101,7 +121,14 @@ func (c *ClientCommands) Add(cmd Command) error {
 
 // Del removes the specified command
 func (c *ClientCommands) Del(name string) error {
-	respReader, err := c.CentClient.centreonAPIRequest("del", commandObject, name)
+	if name == "" {
+		return pkgerrors.New("name parameter cannot be empty when calling Del " +
+			"function")
+	}
+
+	respReader, err := c.CentClient.centreonAPIRequest("del", commandObject,
+		name)
+
 	if err != nil {
 		return err
 	}
@@ -114,10 +141,19 @@ func (c *ClientCommands) Del(name string) error {
 }
 
 // Setparam is used to change a specific parameters for a command
-func (c *ClientCommands) Setparam(name string, param string, value string) error {
+func (c *ClientCommands) Setparam(name string, param string,
+	value string) error {
+
+	if name == "" || param == "" {
+		return pkgerrors.New("name or param parameters cannot be empty when " +
+			"calling Setparam function")
+	}
+
 	values := name + ";" + param + ";" + value
 
-	respReader, err := c.CentClient.centreonAPIRequest("setparam", commandObject, values)
+	respReader, err := c.CentClient.centreonAPIRequest("setparam", commandObject,
+		values)
+
 	if err != nil {
 		return err
 	}
