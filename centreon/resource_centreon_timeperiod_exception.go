@@ -8,6 +8,8 @@ import (
 	"github.com/smutel/go-centreon/centreonweb"
 )
 
+const idSeparator = "#"
+
 func resourceCentreonTimeperiodException() *schema.Resource {
 	return &schema.Resource{
 		Create: resourceCentreonTimeperiodExceptionCreate,
@@ -56,7 +58,7 @@ func resourceCentreonTimeperiodExceptionCreate(d *schema.ResourceData,
 		return err
 	}
 
-	d.SetId(tmpID + "_" + tmpExDays)
+	d.SetId(tmpID + idSeparator + tmpExDays)
 
 	return resourceCentreonTimeperiodExceptionRead(d, m)
 }
@@ -160,7 +162,7 @@ func resourceCentreonTimeperiodExceptionExists(d *schema.ResourceData,
 }
 
 func extractTimeperiodID(ID string) (string, string, error) {
-	tmpIDSlice := strings.Split(ID, "_")
+	tmpIDSlice := strings.Split(ID, idSeparator)
 	if len(tmpIDSlice) != 2 {
 		return "", "", pkgerrors.New("unable to extract timeperiod name and " +
 			"timeperiod exception days from terraform Id")
