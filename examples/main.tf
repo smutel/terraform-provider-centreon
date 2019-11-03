@@ -12,18 +12,16 @@ resource "centreon_timeperiod" "tf-workhours" {
   wednesday = "08:00-18:00"
   thursday  = "08:00-18:00"
   friday    = "08:00-18:00"
-}
 
-resource "centreon_timeperiod_exception" "tf_time_exception1" {
-  timeperiod_id = "${centreon_timeperiod.tf-workhours.id}"
-  days          = "January 1"
-  timerange     = "08:00-18:00"
-}
+  exception {
+    days      = "January 1"
+    timerange = "08:00-18:00"
+  }
 
-resource "centreon_timeperiod_exception" "tf_time_exception2" {
-  timeperiod_id = "${centreon_timeperiod.tf-workhours.id}"
-  days          = "December 25"
-  timerange     = "08:00-18:00"
+  exception {
+    days      = "December 25"
+    timerange = "08:00-18:00"
+  }
 }
 
 resource "centreon_host" "tf_host" {

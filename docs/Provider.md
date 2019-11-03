@@ -32,6 +32,11 @@ resource "centreon_timeperiod" "tp1" {
   wednesday = "08:00-18:00"
   thursday  = "08:00-18:00"
   friday    = "08:00-18:00"
+
+  exception {
+    days      = "January 1"
+    timerange = "08:00-18:00"
+  }
 }
 ```
 
@@ -45,25 +50,10 @@ _Argument Reference_:
 * ``thursday``  - (optional) A time exception (format=00:00-00:00) for Thursday.
 * ``friday``    - (optional) A time exception (format=00:00-00:00) for Friday.
 * ``saturday``  - (optional) A time exception (format=00:00-00:00) for Saturday.
+* ``exception`` - (optional) Define a time exception for this timeperiod.
+  * ``days``          - (mandatory) The day when to apply this exception.
+  * ``timerange``     - (mandatory) A time exception (format=00:00-00:00) for this day.
 
-For further information check centreon CLAPI [documentation](https://documentation-fr.centreon.com/docs/centreon/en/latest/api/clapi/objects/time_periods.html).
-
-## Resource centreon_timeperiod_exception
-
-Create a timeperiod in Centreon.
-
-```hcl
-resource "centreon_timeperiod_exception" "tp1_ex1" {
-  timeperiod_id = "${centreon_timeperiod.tp1.id}"
-  days          = "January 1"
-  timerange     = "08:00-18:00"
-}
-```
-
-_Argument Reference_:
-* ``timeperiod_id`` - (mandatory) The id of the timeperiod to attach this exception.
-* ``days``          - (mandatory) The day when to apply this exception.
-* ``timerange``     - (mandatory) A time exception (format=00:00-00:00) for this day.
 
 For further information check centreon CLAPI [documentation](https://documentation-fr.centreon.com/docs/centreon/en/latest/api/clapi/objects/time_periods.html).
 
