@@ -18,45 +18,53 @@ func resourceCentreonTimeperiod() *schema.Resource {
 				Type:     schema.TypeString,
 				Required: true,
 			},
-
 			"alias": {
 				Type:     schema.TypeString,
 				Required: true,
 			},
-
 			centreonweb.TimeperiodSunday: {
 				Type:     schema.TypeString,
 				Optional: true,
 			},
-
 			centreonweb.TimeperiodMonday: {
 				Type:     schema.TypeString,
 				Optional: true,
 			},
-
 			centreonweb.TimeperiodTuesday: {
 				Type:     schema.TypeString,
 				Optional: true,
 			},
-
 			centreonweb.TimeperiodWednesday: {
 				Type:     schema.TypeString,
 				Optional: true,
 			},
-
 			centreonweb.TimeperiodThursday: {
 				Type:     schema.TypeString,
 				Optional: true,
 			},
-
 			centreonweb.TimeperiodFriday: {
 				Type:     schema.TypeString,
 				Optional: true,
 			},
-
 			centreonweb.TimeperiodSaturday: {
 				Type:     schema.TypeString,
 				Optional: true,
+			},
+			"exception": {
+				Type:     schema.TypeSet,
+				Optional: true,
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"days": {
+							Type:     schema.TypeString,
+							Required: true,
+						},
+						"timerange": {
+							Type:     schema.TypeString,
+							Required: true,
+						},
+					},
+				},
 			},
 		},
 	}
@@ -81,6 +89,7 @@ func resourceCentreonTimeperiodCreate(d *schema.ResourceData,
 	}
 	d.SetPartial("name")
 	d.SetPartial("alias")
+	d.SetId(tmpName)
 
 	tmpSunday := d.Get(centreonweb.TimeperiodSunday).(string)
 	if tmpSunday != "" {
@@ -145,8 +154,21 @@ func resourceCentreonTimeperiodCreate(d *schema.ResourceData,
 		d.SetPartial(centreonweb.TimeperiodSaturday)
 	}
 
+	tmpEx := d.Get("exception").(*schema.Set).List()
+	for _, eRaw := range tmpEx {
+		e := eRaw.(map[string]interface{})
+
+		tmpExDays := e["days"].(string)
+		tmpExTimerange := e["timerange"].(string)
+
+		if err := client.Timeperiods().Setexception(tmpName, tmpExDays,
+			tmpExTimerange); err != nil {
+			return err
+		}
+	}
+
+	d.SetPartial("exception")
 	d.Partial(false)
-	d.SetId(tmpName)
 
 	return resourceCentreonTimeperiodRead(d, m)
 }
@@ -171,6 +193,23 @@ func resourceCentreonTimeperiodRead(d *schema.ResourceData,
 		d.Set("thursday", tmp.Thursday)
 		d.Set("friday", tmp.Friday)
 		d.Set("saturday", tmp.Saturday)
+
+		tmpExs, err := client.Timeperiods().Getexception(tmp.Name)
+		if err != nil {
+			return err
+		}
+
+		exceptions := make([]map[string]interface{}, len(tmpExs))
+		i := 0
+		for _, exception := range tmpExs {
+			e := make(map[string]interface{})
+			e["days"] = exception.Days
+			e["value"] = exception.Timerange
+			exceptions[i] = e
+			i++
+		}
+		d.Set("exception", exceptions)
+
 		return nil
 	}
 
@@ -264,6 +303,42 @@ func resourceCentreonTimeperiodUpdate(d *schema.ResourceData,
 		}
 
 		d.SetPartial("saturday")
+	}
+
+	if d.HasChange("exception") {
+		tmpExs := d.Get("exception").(*schema.Set).List()
+		tmpExsSlice := make([]string, len(tmpExs))
+		for i, eRaw := range tmpExs {
+			e := eRaw.(map[string]interface{})
+			tmpExsSlice[i] = e["days"].(string)
+			tmpExDays := e["days"].(string)
+			tmpExTimerange := e["timerange"].(string)
+
+			if err := client.Timeperiods().Setexception(d.Id(), tmpExDays,
+				tmpExTimerange); err != nil {
+				return err
+			}
+		}
+
+		currentTmpExs, err := client.Timeperiods().Getexception(d.Id())
+		if err != nil {
+			return err
+		}
+
+		exceptions := make([]string, len(currentTmpExs))
+		for i, currentException := range currentTmpExs {
+			exceptions[i] = currentException.Days
+		}
+
+		tmpExsRemove := diffSlices(exceptions, tmpExsSlice)
+		for _, tmpExRemove := range tmpExsRemove {
+			if err := client.Timeperiods().Delexception(d.Id(),
+				tmpExRemove); err != nil {
+				return err
+			}
+		}
+
+		d.SetPartial("exception")
 	}
 
 	d.Partial(false)

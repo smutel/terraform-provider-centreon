@@ -35,9 +35,9 @@ func Provider() *schema.Provider {
 			},
 		},
 		ResourcesMap: map[string]*schema.Resource{
-			"centreon_command":              resourceCentreonCommand(),
-			"centreon_timeperiod":           resourceCentreonTimeperiod(),
-			"centreon_timeperiod_exception": resourceCentreonTimeperiodException(),
+			"centreon_command":    resourceCentreonCommand(),
+			"centreon_timeperiod": resourceCentreonTimeperiod(),
+			"centreon_host":       resourceCentreonHost(),
 		},
 		ConfigureFunc: configureProvider,
 	}

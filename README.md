@@ -88,3 +88,8 @@ $ export CENTREON_PASSWORD="centreon"
 $ cd examples/commands
 $ terraform init & terraform apply
 ```
+## Known bugs which can impact this provider
+
+* Issue [7621](https://github.com/centreon/centreon/issues/7621)
+* PR [8085](https://github.com/centreon/centreon/pull/8085)
+* PR [7678](https://github.com/centreon/centreon/pull/7678)

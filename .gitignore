@@ -46,4 +46,5 @@ override.tf.json
 # example: *tfplan*
 
 # Exclude the provider
-terraform-provider-centreon
+terraform-provider-centreon*
+builds/*

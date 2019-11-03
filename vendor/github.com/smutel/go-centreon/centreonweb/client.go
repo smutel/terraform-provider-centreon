@@ -32,7 +32,9 @@ type centreonwebConfigInput struct {
 }
 
 // New returns a ClientCentreonWeb object created with the specified parameters
-func New(centreonURL string, insecure bool, username string, password string) (*ClientCentreonWeb, error) {
+func New(centreonURL string, insecure bool, username string,
+	password string) (*ClientCentreonWeb, error) {
+
 	client, err := client.New(centreonURL, insecure)
 
 	if err != nil {
@@ -54,7 +56,8 @@ func New(centreonURL string, insecure bool, username string, password string) (*
 	authInput.Add("password", password)
 
 	authHeader := &http.Header{}
-	authHeader.Set("Content-Type", "application/x-www-form-urlencoded; param=value")
+	authHeader.Set("Content-Type", "application/x-www-form-urlencoded; "+
+		"param=value")
 
 	return &ClientCentreonWeb{
 		MainClient:   client,
@@ -72,13 +75,21 @@ func (c *ClientCentreonWeb) Commands() *ClientCommands {
 	return &ClientCommands{c}
 }
 
-// Timeperiods returns a Timeperiods client used for accessing functions pertaining
-// to Timeperiods functionality in the Centreon API.
+// Timeperiods returns a Timeperiods client used for accessing functions
+// pertaining to Timeperiods functionality in the Centreon API.
 func (c *ClientCentreonWeb) Timeperiods() *ClientTimeperiods {
 	return &ClientTimeperiods{c}
 }
 
-func (c *ClientCentreonWeb) centreonAPIRequest(action string, object string, values string) (io.ReadCloser, error) {
+// Hosts returns a Hosts client used for accessing functions
+// pertaining to Hosts functionality in the Centreon API.
+func (c *ClientCentreonWeb) Hosts() *ClientHosts {
+	return &ClientHosts{c}
+}
+
+func (c *ClientCentreonWeb) centreonAPIRequest(action string, object string,
+	values string) (io.ReadCloser, error) {
+
 	err := c.login()
 	if err != nil {
 		return nil, err
@@ -120,13 +131,15 @@ func (input *centreonwebConfigInput) toAPI() (map[string]interface{}, error) {
 	if input.Action != "" {
 		result["action"] = input.Action
 	} else {
-		return nil, pkgerrors.New("action is mandatory to send request to centreon API")
+		return nil, pkgerrors.New("action is mandatory to send request to " +
+			"centreon API")
 	}
 
 	if input.Object != "" {
 		result["object"] = input.Object
 	} else {
-		return nil, pkgerrors.New("object is mandatory to send request to centreon API")
+		return nil, pkgerrors.New("object is mandatory to send request to " +
+			"centreon API")
 	}
 
 	if input.Values != "" {
